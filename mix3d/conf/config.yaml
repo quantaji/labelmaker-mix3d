@@ -10,10 +10,10 @@ general:
   save_dir: saved/${general.experiment_name}/${now:%Y-%m-%d_%H%M}
   # time/commit/md5(config)_uuid
   # time/experiment_id/version_uuid
-  experiment_id: ??? # commit[:8], or unique from logger
-  version: ??? # md5[:8] of config
+  experiment_id: test # commit[:8], or unique from logger
+  version: test # md5[:8] of config
 
-  gpus: ???
+  gpus: 1
 
 defaults:
   - data: indoor
