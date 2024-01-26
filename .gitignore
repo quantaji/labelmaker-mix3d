@@ -135,3 +135,6 @@ dmypy.json
 
 # nfs silly rename files
 .nfs*
+
+MinkowskiEngine/
+data/

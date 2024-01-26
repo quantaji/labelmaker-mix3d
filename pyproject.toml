@@ -30,12 +30,10 @@ classifiers=[
 
 [tool.poetry.dependencies]
 # main parts
-python = "^3.7"
-torch = "^1.5.0"
-torchvision = "^0.6.0"
+python = "^3.9"
+torch = "^2.0.0"
+torchvision = "^0.15.1"
 pytorch-lightning = "^1.1.1"
-MinkowskiEngine = "^0.4.3"
-open3d = "0.9.0"
 volumentations = "^0.1.0"
 albumentations = "^0.4.5"
 plyfile = "^0.7.1"
@@ -44,7 +42,6 @@ gitpython = "^3.1.0"
 python-dotenv = "^0.12.0"
 hydra-core = "^1.0.4"
 # logging
-neptune-client = "^0.4.107"
 loguru = "^0.4.1"
 psutil = "^5.7.0"
 # viz
@@ -60,7 +57,7 @@ importlib_metadata = {version = "^1.6.0", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.3.5"
-dvc = "^1.0.1"
+dvc = ">=1.0.1"
 pudb = "^2019.2"
 pytest-pudb = "^0.7.0"
 black = "^19.10b0"
