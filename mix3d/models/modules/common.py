@@ -108,7 +108,7 @@ def convert_conv_type(conv_type, kernel_size, D):
     elif conv_type == ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS:
         # Define the CUBIC conv kernel for spatial dims and CROSS conv for temp dim
         axis_types = [
-            ME.RegionType.HYPERCUBE,
+            ME.RegionType.HYPER_CUBE,
         ] * 3
         if D == 4:
             axis_types.append(ME.RegionType.HYPERCROSS)
@@ -126,13 +126,15 @@ def conv(
     D=-1,
 ):
     assert D > 0, "Dimension must be a positive integer"
-    region_type, axis_types, kernel_size = convert_conv_type(conv_type, kernel_size, D)
+    region_type, axis_types, kernel_size = convert_conv_type(
+        conv_type, kernel_size, D
+    )
     kernel_generator = ME.KernelGenerator(
         kernel_size,
         stride,
         dilation,
         region_type=region_type,
-        axis_types=axis_types,
+        axis_types=None,  # axis_types JONAS
         dimension=D,
     )
 
@@ -142,7 +144,7 @@ def conv(
         kernel_size=kernel_size,
         stride=stride,
         dilation=dilation,
-        has_bias=bias,
+        bias=bias,
         kernel_generator=kernel_generator,
         dimension=D,
     )
@@ -175,7 +177,7 @@ def conv_tr(
         kernel_size=kernel_size,
         stride=upsample_stride,
         dilation=dilation,
-        has_bias=bias,
+        bias=bias,
         kernel_generator=kernel_generator,
         dimension=D,
     )

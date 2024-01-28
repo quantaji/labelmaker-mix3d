@@ -20,10 +20,14 @@ class ScannetPreprocessing(BasePreprocessing):
         self,
         data_dir: str = "./data/raw/scannet/scannet",
         save_dir: str = "./data/processed/scannet",
-        modes: tuple = ("train", "validation", "test"),
+        modes: tuple = (
+            "test",
+            "train",
+            "validation",
+        ),
         n_jobs: int = -1,
         git_repo: str = "./data/raw/scannet/ScanNet",
-        scannet200: bool = False,
+        scannet200: bool = True,
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
@@ -131,10 +135,6 @@ class ScannetPreprocessing(BasePreprocessing):
             filebase["raw_instance_filepath"] = instance_info_filepath
             filebase["raw_segmentation_filepath"] = segment_indexes_filepath
 
-            # add segment id as additional feature
-            segment_ids = np.unique(segments, return_inverse=True)[1]
-            points = np.hstack((points, segment_ids[..., None]))
-
             # reading labels file
             label_filepath = filepath.parent / filepath.name.replace(".ply", ".labels.ply")
             filebase["raw_label_filepath"] = label_filepath
@@ -161,14 +161,6 @@ class ScannetPreprocessing(BasePreprocessing):
 
             # gt_data = (points[:, -2] + 1) * 1000 + points[:, -1] + 1
             gt_data = points[:, -2] * 1000 + points[:, -1] + 1
-
-        # else:
-        #     segments = self._read_json(f"{filepath.parent}/.0.010000.segs.json")
-        #     segments = np.array(segments["segIndices"])
-        #     # add segment id as additional feature
-        #     segment_ids = np.unique(segments, return_inverse=True)[1]
-        #     print(points.shape, segment_ids.shape)
-        #     points = np.hstack((points, segment_ids[..., None]))
 
         processed_filepath = self.save_dir / mode / f"{scene:04}_{sub_scene:02}.npy"
         if not processed_filepath.parent.exists():

@@ -1,30 +1,31 @@
+from typing import List, Optional, Tuple, Union
+
 import logging
+from copy import deepcopy
 from itertools import product
 from pathlib import Path
-from random import random, sample, uniform
-from typing import List, Optional, Tuple, Union
-from random import choice
-from copy import deepcopy
+from random import choice, random, sample, uniform
+
+import numpy as np
 
 import albumentations as A
-import numpy as np
 import scipy
 import volumentations as V
 import yaml
+from mix3d.datasets.random_cuboid import RandomCuboid
+from mix3d.datasets.scannet200.scannet200_constants import SCANNET_COLOR_MAP_20, SCANNET_COLOR_MAP_200
 from torch.utils.data import Dataset
 
 logger = logging.getLogger(__name__)
 
 
 class SemanticSegmentationDataset(Dataset):
-    """Docstring for SemanticSegmentationDataset. """
+    """Docstring for SemanticSegmentationDataset."""
 
     def __init__(
         self,
         data_dir: Optional[Union[str, Tuple[str]]] = "data/processed/scannet",
-        label_db_filepath: Optional[
-            str
-        ] = "configs/scannet_preprocessing/label_database.yaml",
+        label_db_filepath: Optional[str] = "configs/scannet_preprocessing/label_database.yaml",
         # mean std values from scannet
         color_mean_std: Optional[Union[str, Tuple[Tuple[float]]]] = (
             (0.47793125906962, 0.4303257521323044, 0.3749598901421883),
@@ -54,9 +55,7 @@ class SemanticSegmentationDataset(Dataset):
         self.data_dir = data_dir
         self.add_unlabeled_pc = add_unlabeled_pc
         if add_unlabeled_pc:
-            self.other_database = self._load_yaml(
-                Path(data_dir).parent / "matterport" / "train_database.yaml"
-            )
+            self.other_database = self._load_yaml(Path(data_dir).parent / "matterport" / "train_database.yaml")
         if type(data_dir) == str:
             self.data_dir = [self.data_dir]
         self.ignore_label = ignore_label
@@ -88,9 +87,7 @@ class SemanticSegmentationDataset(Dataset):
         self._labels = self._select_correct_labels(labels, num_labels)
 
         if instance_oversampling > 0:
-            self.instance_data = self._load_yaml(
-                Path(label_db_filepath).parent / "instance_database.yaml"
-            )
+            self.instance_data = self._load_yaml(Path(label_db_filepath).parent / "instance_database.yaml")
 
         # normalize color channels
         if Path(str(color_mean_std)).exists():
@@ -106,19 +103,11 @@ class SemanticSegmentationDataset(Dataset):
 
         # augmentations
         self.volume_augmentations = V.NoOp()
-        if (volume_augmentations_path is not None) and (
-            volume_augmentations_path != "none"
-        ):
-            self.volume_augmentations = V.load(
-                Path(volume_augmentations_path), data_format="yaml"
-            )
+        if (volume_augmentations_path is not None) and (volume_augmentations_path != "none"):
+            self.volume_augmentations = V.load(Path(volume_augmentations_path), data_format="yaml")
         self.image_augmentations = A.NoOp()
-        if (image_augmentations_path is not None) and (
-            image_augmentations_path != "none"
-        ):
-            self.image_augmentations = A.load(
-                Path(image_augmentations_path), data_format="yaml"
-            )
+        if (image_augmentations_path is not None) and (image_augmentations_path != "none"):
+            self.image_augmentations = A.load(Path(image_augmentations_path), data_format="yaml")
         # mandatory color augmentation
         if add_colors:
             self.normalize_color = A.Normalize(mean=color_mean, std=color_std)
@@ -154,9 +143,7 @@ class SemanticSegmentationDataset(Dataset):
             coordinates += np.random.uniform(coordinates.min(0), coordinates.max(0)) / 2
 
             if self.instance_oversampling > 0.0:
-                coordinates, color, normals, labels = self.augment_individual_instance(
-                    coordinates, color, normals, labels, self.instance_oversampling
-                )
+                coordinates, color, normals, labels = self.augment_individual_instance(coordinates, color, normals, labels, self.instance_oversampling)
 
             if self.flip_in_center:
                 coordinates = flip_in_center(coordinates)
@@ -167,11 +154,12 @@ class SemanticSegmentationDataset(Dataset):
                     coordinates[:, i] = coord_max - coordinates[:, i]
             if random() < 0.95:
                 for granularity, magnitude in ((0.2, 0.4), (0.8, 1.6)):
-                    coordinates = elastic_distortion(
-                        coordinates, granularity, magnitude
-                    )
+                    coordinates = elastic_distortion(coordinates, granularity, magnitude)
             aug = self.volume_augmentations(
-                points=coordinates, normals=normals, features=color, labels=labels,
+                points=coordinates,
+                normals=normals,
+                features=color,
+                labels=labels,
             )
             coordinates, color, normals, labels = (
                 aug["points"],
@@ -194,9 +182,7 @@ class SemanticSegmentationDataset(Dataset):
                     y_max = y_min + size_of_cut
                     z_min = point[2] - size_of_cut
                     z_max = z_min + size_of_cut
-                    indexes = crop(
-                        coordinates, x_min, y_min, z_min, x_max, y_max, z_max
-                    )
+                    indexes = crop(coordinates, x_min, y_min, z_min, x_max, y_max, z_max)
                     coordinates, normals, color, labels = (
                         coordinates[~indexes],
                         normals[~indexes],
@@ -227,11 +213,7 @@ class SemanticSegmentationDataset(Dataset):
 
             if self.add_unlabeled_pc:
                 if random() < 0.8:
-                    new_points = np.load(
-                        self.other_database[
-                            np.random.randint(0, len(self.other_database) - 1)
-                        ]["filepath"]
-                    )
+                    new_points = np.load(self.other_database[np.random.randint(0, len(self.other_database) - 1)]["filepath"])
                     (
                         unlabeled_coords,
                         unlabeled_color,
@@ -244,12 +226,7 @@ class SemanticSegmentationDataset(Dataset):
                         new_points[:, 9:],
                     )
                     unlabeled_coords -= unlabeled_coords.mean(0)
-                    unlabeled_coords += (
-                        np.random.uniform(
-                            unlabeled_coords.min(0), unlabeled_coords.max(0)
-                        )
-                        / 2
-                    )
+                    unlabeled_coords += np.random.uniform(unlabeled_coords.min(0), unlabeled_coords.max(0)) / 2
 
                     aug = self.volume_augmentations(
                         points=unlabeled_coords,
@@ -269,16 +246,12 @@ class SemanticSegmentationDataset(Dataset):
                         aug["labels"],
                     )
                     pseudo_image = unlabeled_color.astype(np.uint8)[np.newaxis, :, :]
-                    unlabeled_color = np.squeeze(
-                        self.image_augmentations(image=pseudo_image)["image"]
-                    )
+                    unlabeled_color = np.squeeze(self.image_augmentations(image=pseudo_image)["image"])
 
                     coordinates = np.concatenate((coordinates, unlabeled_coords))
                     color = np.concatenate((color, unlabeled_color))
                     normals = np.concatenate((normals, unlabeled_normals))
-                    labels = np.concatenate(
-                        (labels, np.full_like(unlabeled_labels, self.ignore_label))
-                    )
+                    labels = np.concatenate((labels, np.full_like(unlabeled_labels, self.ignore_label)))
 
         # normalize color information
         pseudo_image = color.astype(np.uint8)[np.newaxis, :, :]
@@ -302,12 +275,12 @@ class SemanticSegmentationDataset(Dataset):
 
     @property
     def data(self):
-        """ database file containing information about preproscessed dataset """
+        """database file containing information about preproscessed dataset"""
         return self._data
 
     @property
     def label_info(self):
-        """ database file containing information labels used by dataset """
+        """database file containing information labels used by dataset"""
         return self._labels
 
     @staticmethod
@@ -319,7 +292,10 @@ class SemanticSegmentationDataset(Dataset):
     def _select_correct_labels(self, labels, num_labels):
         number_of_validation_labels = 0
         number_of_all_labels = 0
-        for k, v, in labels.items():
+        for (
+            k,
+            v,
+        ) in labels.items():
             number_of_all_labels += 1
             if v["validation"]:
                 number_of_validation_labels += 1
@@ -328,7 +304,10 @@ class SemanticSegmentationDataset(Dataset):
             return labels
         elif num_labels == number_of_validation_labels:
             valid_labels = dict()
-            for k, v, in labels.items():
+            for (
+                k,
+                v,
+            ) in labels.items():
                 if v["validation"]:
                     valid_labels.update({k: v})
             return valid_labels
@@ -351,16 +330,12 @@ class SemanticSegmentationDataset(Dataset):
             output_remapped[output == i] = k
         return output_remapped
 
-    def augment_individual_instance(
-        self, coordinates, color, normals, labels, oversampling=1.0
-    ):
+    def augment_individual_instance(self, coordinates, color, normals, labels, oversampling=1.0):
         max_instance = int(len(np.unique(labels[:, 1])))
         # randomly selecting half of non-zero instances
         for instance in range(0, int(max_instance * oversampling)):
             if self.place_around_existing:
-                center = choice(
-                    coordinates[labels[:, 1] == choice(np.unique(labels[:, 1]))]
-                )
+                center = choice(coordinates[labels[:, 1] == choice(np.unique(labels[:, 1]))])
             else:
                 center = np.array([uniform(-5, 5), uniform(-5, 5), uniform(-0.5, 2)])
             instance = choice(choice(self.instance_data))
@@ -396,7 +371,7 @@ def elastic_distortion(pointcloud, granularity, magnitude):
     pointcloud: numpy array of (number of points, at least 3 spatial dims)
     granularity: size of the noise grid (in same scale[m/cm] as the voxel grid)
     magnitude: noise multiplier
-  """
+    """
     blurx = np.ones((3, 1, 1, 1)).astype("float32") / 3
     blury = np.ones((1, 3, 1, 1)).astype("float32") / 3
     blurz = np.ones((1, 1, 3, 1)).astype("float32") / 3
@@ -422,9 +397,7 @@ def elastic_distortion(pointcloud, granularity, magnitude):
             noise_dim,
         )
     ]
-    interp = scipy.interpolate.RegularGridInterpolator(
-        ax, noise, bounds_error=0, fill_value=0
-    )
+    interp = scipy.interpolate.RegularGridInterpolator(ax, noise, bounds_error=0, fill_value=0)
     pointcloud[:, :3] = coords + interp(coords) * magnitude
     return pointcloud
 
@@ -503,15 +476,17 @@ def flip_in_center(coordinates):
 
 
 def random_around_points(
-    coordinates, color, normals, labels, rate=0.2, noise_rate=0, ignore_label=255
+    coordinates,
+    color,
+    normals,
+    labels,
+    rate=0.2,
+    noise_rate=0,
+    ignore_label=255,
 ):
-    coord_indexes = sample(
-        list(range(len(coordinates))), k=int(len(coordinates) * rate)
-    )
+    coord_indexes = sample(list(range(len(coordinates))), k=int(len(coordinates) * rate))
     noisy_coordinates = deepcopy(coordinates[coord_indexes])
-    noisy_coordinates += np.random.uniform(
-        -0.2 - noise_rate, 0.2 + noise_rate, size=noisy_coordinates.shape
-    )
+    noisy_coordinates += np.random.uniform(-0.2 - noise_rate, 0.2 + noise_rate, size=noisy_coordinates.shape)
 
     if noise_rate > 0:
         noisy_color = np.random.randint(0, 255, size=noisy_coordinates.shape)
@@ -535,9 +510,7 @@ def random_around_points(
     return coordinates, color, normals, labels
 
 
-def random_points(
-    coordinates, color, normals, labels, noise_rate=0.6, ignore_label=255
-):
+def random_points(coordinates, color, normals, labels, noise_rate=0.6, ignore_label=255):
     max_boundary = coordinates.max(0) + 0.1
     min_boundary = coordinates.min(0) - 0.1
 
@@ -552,9 +525,7 @@ def random_points(
             )
         )
     )
-    noisy_coordinates += np.random.uniform(
-        -noise_rate, noise_rate, size=noisy_coordinates.shape
-    )
+    noisy_coordinates += np.random.uniform(-noise_rate, noise_rate, size=noisy_coordinates.shape)
 
     noisy_color = np.random.randint(0, 255, size=noisy_coordinates.shape)
     noisy_normals = np.random.rand(*noisy_coordinates.shape) * 2 - 1

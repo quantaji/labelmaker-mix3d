@@ -27,6 +27,7 @@ class VoxelizeCollate:
             batch = make_crops(batch)
         if ("train" in self.mode) and self.very_small_crops:
             batch = make_crops(batch)
+
         return voxelize(batch, self.ignore_label, self.voxel_size)
 
 
@@ -58,11 +59,7 @@ class VoxelizeCollateMerge:
         self.proba = proba
 
     def __call__(self, batch):
-        if (
-            ("train" in self.mode)
-            and (not self.make_one_pc_noise)
-            and (self.proba > random())
-        ):
+        if ("train" in self.mode) and (not self.make_one_pc_noise) and (self.proba > random()):
             if self.small_crops or self.very_small_crops:
                 batch = make_crops(batch)
             if self.very_small_crops:
@@ -83,9 +80,7 @@ class VoxelizeCollateMerge:
                     border -= batch_coordinates[1][:, 0].min()
                     batch_coordinates[1][:, 0] += border
                 elif (len(batch_coordinates) == 2) and self.place_far:
-                    batch_coordinates[1] += (
-                        np.random.uniform((-10, -10, -10), (10, 10, 10)) * 200
-                    )
+                    batch_coordinates[1] += np.random.uniform((-10, -10, -10), (10, 10, 10)) * 200
                 new_batch.append(
                     (
                         np.vstack(batch_coordinates),
@@ -143,7 +138,13 @@ def batch_instances(batch):
 
 
 def voxelize(batch, ignore_label, voxel_size):
-    (coordinates, features, labels, original_labels, inverse_maps,) = (
+    (
+        coordinates,
+        features,
+        labels,
+        original_labels,
+        inverse_maps,
+    ) = (
         [],
         [],
         [],
@@ -160,8 +161,13 @@ def voxelize(batch, ignore_label, voxel_size):
         original_labels.append(sample[2])
 
         coords = np.floor(sample[0] / voxel_size)
-        voxelization_dict.update({"coords": coords, "feats": sample[1]})
-        unique_map, inverse_map = ME.utils.sparse_quantize(**voxelization_dict)
+        voxelization_dict.update(
+            {
+                "coordinates": torch.from_numpy(coords).to("cpu").contiguous(),
+                "features": sample[1],
+            }
+        )
+        _, _, unique_map, inverse_map = ME.utils.sparse_quantize(**voxelization_dict)
         inverse_maps.append(inverse_map)
 
         sample_coordinates = coords[unique_map]
@@ -181,7 +187,12 @@ def voxelize(batch, ignore_label, voxel_size):
         coordinates, features = ME.utils.sparse_collate(**input_dict)
         labels = torch.Tensor([])
     return (
-        NoGpu(coordinates, features, original_labels, inverse_maps,),
+        NoGpu(
+            coordinates,
+            features,
+            original_labels,
+            inverse_maps,
+        ),
         labels,
     )
 
@@ -242,9 +253,13 @@ def make_crops(batch):
 
 class NoGpu:
     def __init__(
-        self, coordinates, features, original_labels=None, inverse_maps=None,
+        self,
+        coordinates,
+        features,
+        original_labels=None,
+        inverse_maps=None,
     ):
-        """ helper class to prevent gpu loading on lightning """
+        """helper class to prevent gpu loading on lightning"""
         self.coordinates = coordinates
         self.features = features
         self.original_labels = original_labels

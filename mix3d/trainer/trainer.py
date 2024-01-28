@@ -39,8 +39,11 @@ class SemanticSegmentation(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         data, target = batch
-        data = ME.SparseTensor(coords=data.coordinates, feats=data.features)
-        data.to(self.device)
+        data = ME.SparseTensor(
+            coordinates=data.coordinates,
+            features=data.features,
+            device=self.device,
+        )
         output = self.forward(data)
         loss = self.criterion(output.F, target).unsqueeze(0)
 
@@ -50,11 +53,17 @@ class SemanticSegmentation(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         data, target = batch
+
         inverse_maps = data.inverse_maps
         original_labels = data.original_labels
-        data = ME.SparseTensor(coords=data.coordinates, feats=data.features)
-        data.to(self.device)
+        data = ME.SparseTensor(
+            coordinates=data.coordinates,
+            features=data.features,
+            device=self.device,
+        )
+
         output = self.forward(data)
+        print(target.shape)
         loss = self.criterion(output.F, target).unsqueeze(0)
 
         # getting original labels
@@ -146,32 +155,26 @@ class SemanticSegmentation(pl.LightningModule):
         self.log_dict(results)
 
     def configure_optimizers(self):
-        optimizer = hydra.utils.instantiate(
-            self.config.optimizer, params=self.parameters()
-        )
+        optimizer = hydra.utils.instantiate(self.config.optimizer, params=self.parameters())
         if "steps_per_epoch" in self.config.scheduler.scheduler.keys():
-            self.config.scheduler.scheduler.steps_per_epoch = len(
-                self.train_dataloader()
-            )
-        lr_scheduler = hydra.utils.instantiate(
-            self.config.scheduler.scheduler, optimizer=optimizer
-        )
+            self.config.scheduler.scheduler.steps_per_epoch = len(self.train_dataloader())
+        lr_scheduler = hydra.utils.instantiate(self.config.scheduler.scheduler, optimizer=optimizer)
         scheduler_config = {"scheduler": lr_scheduler}
         scheduler_config.update(self.config.scheduler.pytorch_lightning_params)
         return [optimizer], [scheduler_config]
 
     def prepare_data(self):
         self.train_dataset = hydra.utils.instantiate(self.config.data.train_dataset)
-        self.validation_dataset = hydra.utils.instantiate(
-            self.config.data.validation_dataset
-        )
+        self.validation_dataset = hydra.utils.instantiate(self.config.data.validation_dataset)
         self.test_dataset = hydra.utils.instantiate(self.config.data.test_dataset)
         self.labels_info = self.train_dataset.label_info
 
     def train_dataloader(self):
         c_fn = hydra.utils.instantiate(self.config.data.train_collation)
         return hydra.utils.instantiate(
-            self.config.data.train_dataloader, self.train_dataset, collate_fn=c_fn,
+            self.config.data.train_dataloader,
+            self.train_dataset,
+            collate_fn=c_fn,
         )
 
     def val_dataloader(self):
@@ -185,7 +188,9 @@ class SemanticSegmentation(pl.LightningModule):
     def test_dataloader(self):
         c_fn = hydra.utils.instantiate(self.config.data.test_collation)
         return hydra.utils.instantiate(
-            self.config.data.test_dataloader, self.test_dataset, collate_fn=c_fn,
+            self.config.data.test_dataloader,
+            self.test_dataset,
+            collate_fn=c_fn,
         )
 
 
@@ -193,11 +198,7 @@ def scannet_submission(path, outputs, results, test_filebase, remap_function):
     # checking if we are submitting scannet
     filepaths = []
     for out, info in zip(outputs, test_filebase):
-        save_path = (
-            Path(path).parent
-            / "submission"
-            / f"scene{info['scene']:04}_{info['sub_scene']:02}.txt"
-        )
+        save_path = Path(path).parent / "submission" / f"scene{info['scene']:04}_{info['sub_scene']:02}.txt"
         if not save_path.parent.exists():
             save_path.parent.mkdir(parents=True, exist_ok=True)
         out = remap_function(out)

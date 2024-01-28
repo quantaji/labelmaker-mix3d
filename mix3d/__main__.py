@@ -8,20 +8,16 @@ import hydra
 import torch
 from dotenv import load_dotenv
 from git import Repo
-from omegaconf import DictConfig, OmegaConf
 from mix3d import __version__
 from mix3d.trainer.trainer import SemanticSegmentation
-from mix3d.utils.utils import (
-    flatten_dict,
-    load_baseline_model,
-    load_checkpoint_with_missing_or_exsessive_keys,
-)
+from mix3d.utils.utils import flatten_dict, load_baseline_model, load_checkpoint_with_missing_or_exsessive_keys
+from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
 
 
 def get_parameters(cfg: DictConfig):
     # making shure reproducable
-    assert not Repo("./").is_dirty(), "repo is dirty, commit first"
+    # assert not Repo("./").is_dirty(), "repo is dirty, commit first"
     logger = logging.getLogger(__name__)
     load_dotenv(".env")
 
@@ -44,16 +40,17 @@ def get_parameters(cfg: DictConfig):
         if "NeptuneLogger" in log._target_:
             loggers.append(
                 hydra.utils.instantiate(
-                    log, api_key=os.environ.get("NEPTUNE_API_TOKEN"), params=params,
+                    log,
+                    api_key=os.environ.get("NEPTUNE_API_TOKEN"),
+                    params=params,
                 )
             )
+            print(log._target_, loggers[-1].version)
             if "offline" not in loggers[-1].version:
                 cfg.general.version = loggers[-1].version
         else:
             loggers.append(hydra.utils.instantiate(log))
-            loggers[-1].log_hyperparams(
-                flatten_dict(OmegaConf.to_container(cfg, resolve=True))
-            )
+            loggers[-1].log_hyperparams(flatten_dict(OmegaConf.to_container(cfg, resolve=True)))
 
     model = SemanticSegmentation(cfg)
     if cfg.general.checkpoint is not None:
@@ -65,6 +62,7 @@ def get_parameters(cfg: DictConfig):
             cfg, model = load_checkpoint_with_missing_or_exsessive_keys(cfg, model)
 
     logger.info(flatten_dict(OmegaConf.to_container(cfg, resolve=True)))
+
     return cfg, model, loggers
 
 
