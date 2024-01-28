@@ -51,7 +51,7 @@ poetry install
 pip install torch==${INSTALLED_PYTORCH_VERSION} torchvision==${INSTALLED_TORCHVISION_VERSION} --index-url https://download.pytorch.org/whl/${INSTALLED_CUDA_ABBREV}
 
 # tune
-pip install pytorch-lightning==1.1.7 torchmetrics==0.11.4 neptune-client==0.4.109 hydra-core==1.0.4
+pip install pytorch-lightning==1.1.7 torchmetrics==0.11.4 neptune-client==0.4.109 hydra-core==1.3.2
 
 # open3d
 pip install https://github.com/cvg/open3d-manylinux2014/releases/download/0.17.0/open3d_cpu-0.17.0-cp39-cp39-manylinux_2_17_x86_64.whl
