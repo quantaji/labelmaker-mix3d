@@ -1,0 +1,105 @@
+nohup: ignoring input
+2024-01-29 22:03:24.376 | INFO     | mix3d.datasets.preprocessing.base_preprocessing:preprocess:45 - Tasks for Training: 4504
+[Parallel(n_jobs=24)]: Using backend LokyBackend with 24 concurrent workers.
+RPly: Unable to open file
+2024-01-29 22:03:29.268 | ERROR    | fire.core:_CallAndUpdateTrace:675 - An error has been caught in function '_CallAndUpdateTrace', process 'MainProcess' (920638), thread 'MainThread' (140137997649024):
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/externals/loky/process_executor.py", line 463, in _process_worker
+    r = call_item()
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/externals/loky/process_executor.py", line 291, in __call__
+    return self.fn(*self.args, **self.kwargs)
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 589, in __call__
+    return [func(*args, **kwargs)
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 589, in <listcomp>
+    return [func(*args, **kwargs)
+  File "/home/guangda/repos/labelmaker-mix3d/mix3d/datasets/preprocessing/arkitscenes_labelmaker.py", line 95, in process_file
+    coords, features, _ = load_ply_with_normals(filepath)
+  File "/home/guangda/repos/labelmaker-mix3d/mix3d/utils/point_cloud_utils.py", line 30, in load_ply_with_normals
+    coords, feats, labels = load_ply(filepath)
+  File "/home/guangda/repos/labelmaker-mix3d/mix3d/utils/point_cloud_utils.py", line 10, in load_ply
+    with open(filepath, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/media/hermann/data/labelmaker/ARKitScene_LabelMaker/Training/40958737/point_lifted_mesh.ply'
+"""
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           │         │     └ {'__name__': '__main__', '__doc__': None, '__package__': 'mix3d.datasets.preprocessing', '__loader__': <_frozen_importlib_ext...
+           │         └ <code object <module> at 0x7f746adc8be0, file "/home/guangda/repos/labelmaker-mix3d/mix3d/datasets/preprocessing/arkitscenes_...
+           └ <function _run_code at 0x7f746afde670>
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+         │     └ {'__name__': '__main__', '__doc__': None, '__package__': 'mix3d.datasets.preprocessing', '__loader__': <_frozen_importlib_ext...
+         └ <code object <module> at 0x7f746adc8be0, file "/home/guangda/repos/labelmaker-mix3d/mix3d/datasets/preprocessing/arkitscenes_...
+
+  File "/home/guangda/repos/labelmaker-mix3d/mix3d/datasets/preprocessing/arkitscenes_labelmaker.py", line 146, in <module>
+    Fire(ARKitScenesLabelMakerPreprocessing)
+    │    └ <class '__main__.ARKitScenesLabelMakerPreprocessing'>
+    └ <function Fire at 0x7f7467541b80>
+
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/fire/core.py", line 138, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+                      │     │          │     │                 │        └ 'arkitscenes_labelmaker.py'
+                      │     │          │     │                 └ {}
+                      │     │          │     └ Namespace(completion=None, help=False, interactive=False, separator='-', trace=False, verbose=False)
+                      │     │          └ ['preprocess', '--data_dir=/media/hermann/data/labelmaker/ARKitScene_LabelMaker', '--save_dir=data/processed/arkitscenes_labe...
+                      │     └ <class '__main__.ARKitScenesLabelMakerPreprocessing'>
+                      └ <function _Fire at 0x7f746746f160>
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/fire/core.py", line 466, in _Fire
+    component, remaining_args = _CallAndUpdateTrace(
+    │                           └ <function _CallAndUpdateTrace at 0x7f746746f280>
+    └ <bound method BasePreprocessing.preprocess of <__main__.ARKitScenesLabelMakerPreprocessing object at 0x7f73e9b665e0>>
+> File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/fire/core.py", line 675, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+                │   │          └ {}
+                │   └ []
+                └ <bound method BasePreprocessing.preprocess of <__main__.ARKitScenesLabelMakerPreprocessing object at 0x7f73e9b665e0>>
+
+  File "/home/guangda/repos/labelmaker-mix3d/mix3d/datasets/preprocessing/base_preprocessing.py", line 46, in preprocess
+    parallel_results = Parallel(n_jobs=self.n_jobs, verbose=10)(delayed(self.process_file)(file, mode) for file in self.files[mode])
+                       │               │    │                   │       │    │                   │                 │    │     └ 'Training'
+                       │               │    │                   │       │    │                   │                 │    └ {'Training': [PosixPath('/media/hermann/data/labelmaker/ARKitScene_LabelMaker/Training/40753679/point_lifted_mesh.ply'), Posi...
+                       │               │    │                   │       │    │                   │                 └ <__main__.ARKitScenesLabelMakerPreprocessing object at 0x7f73e9b665e0>
+                       │               │    │                   │       │    │                   └ 'Training'
+                       │               │    │                   │       │    └ <function ARKitScenesLabelMakerPreprocessing.process_file at 0x7f73e9b68d30>
+                       │               │    │                   │       └ <__main__.ARKitScenesLabelMakerPreprocessing object at 0x7f73e9b665e0>
+                       │               │    │                   └ <function delayed at 0x7f7467261ee0>
+                       │               │    └ 24
+                       │               └ <__main__.ARKitScenesLabelMakerPreprocessing object at 0x7f73e9b665e0>
+                       └ <class 'joblib.parallel.Parallel'>
+
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 1952, in __call__
+    return output if self.return_generator else list(output)
+           │         │    │                          └ <generator object Parallel._get_outputs at 0x7f73e991e510>
+           │         │    └ False
+           │         └ Parallel(n_jobs=24)
+           └ <generator object Parallel._get_outputs at 0x7f73e991e510>
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 1595, in _get_outputs
+    yield from self._retrieve()
+               │    └ <function Parallel._retrieve at 0x7f7467265040>
+               └ Parallel(n_jobs=24)
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 1699, in _retrieve
+    self._raise_error_fast()
+    │    └ <function Parallel._raise_error_fast at 0x7f74672650d0>
+    └ Parallel(n_jobs=24)
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 1734, in _raise_error_fast
+    error_job.get_result(self.timeout)
+    │         │          │    └ None
+    │         │          └ Parallel(n_jobs=24)
+    │         └ <function BatchCompletionCallBack.get_result at 0x7f7467267160>
+    └ <joblib.parallel.BatchCompletionCallBack object at 0x7f74669dbc40>
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 736, in get_result
+    return self._return_or_raise()
+           │    └ <function BatchCompletionCallBack._return_or_raise at 0x7f74672671f0>
+           └ <joblib.parallel.BatchCompletionCallBack object at 0x7f74669dbc40>
+  File "/home/guangda/miniconda3/envs/labelmaker-mix3d-preprocess/lib/python3.8/site-packages/joblib/parallel.py", line 754, in _return_or_raise
+    raise self._result
+          └ <joblib.parallel.BatchCompletionCallBack object at 0x7f74669dbc40>
+
+FileNotFoundError: [Errno 2] No such file or directory: '/media/hermann/data/labelmaker/ARKitScene_LabelMaker/Training/40958737/point_lifted_mesh.ply'

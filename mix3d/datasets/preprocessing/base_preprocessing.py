@@ -43,17 +43,13 @@ class BasePreprocessing:
         for mode in self.modes:
             database = []
             logger.info(f"Tasks for {mode}: {len(self.files[mode])}")
-            parallel_results = Parallel(n_jobs=self.n_jobs, verbose=10)(
-                delayed(self.process_file)(file, mode) for file in self.files[mode]
-            )
+            parallel_results = Parallel(n_jobs=self.n_jobs, verbose=10)(delayed(self.process_file)(file, mode) for file in self.files[mode])
             for filebase in parallel_results:
                 database.append(filebase)
             self.save_database(database, mode)
         self.fix_bugs_in_labels()
         self.joint_database()
-        self.compute_color_mean_std(
-            train_database_path=(self.save_dir / "train_database.yaml")
-        )
+        self.compute_color_mean_std(train_database_path=(self.save_dir / "train_database.yaml"))
 
     def preprocess_sequential(self):
         for mode in self.modes:
@@ -64,9 +60,7 @@ class BasePreprocessing:
             self.save_database(database, mode)
         self.fix_bugs_in_labels()
         self.joint_database()
-        self.compute_color_mean_std(
-            train_database_path=(self.save_dir / "train_database.yaml")
-        )
+        self.compute_color_mean_std(train_database_path=(self.save_dir / "train_database.yaml"))
 
     def process_file(self, filepath, mode):
         """process_file.
@@ -101,10 +95,7 @@ class BasePreprocessing:
         train_database = self._load_yaml(train_database_path)
         instance_database = []
         logger.info(f"Files in database: {len(train_database)}")
-        parallel_results = Parallel(n_jobs=self.n_jobs, verbose=10)(
-            delayed(self.extract_instance_from_file)(sample)
-            for sample in train_database
-        )
+        parallel_results = Parallel(n_jobs=self.n_jobs, verbose=10)(delayed(self.extract_instance_from_file)(sample) for sample in train_database)
         for filebase in parallel_results:
             instance_database.append(filebase)
         self.save_database(instance_database, mode=mode)
@@ -137,7 +128,8 @@ class BasePreprocessing:
         pass
 
     def compute_color_mean_std(
-        self, train_database_path: str = "./data/processed/train_database.yaml",
+        self,
+        train_database_path: str = "./data/processed/train_database.yaml",
     ):
         pass
 

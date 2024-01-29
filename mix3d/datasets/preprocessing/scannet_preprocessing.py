@@ -159,9 +159,6 @@ class ScannetPreprocessing(BasePreprocessing):
                     labels[occupied_indices, 0] = label_id
             points = np.hstack((points, labels))
 
-            # gt_data = (points[:, -2] + 1) * 1000 + points[:, -1] + 1
-            gt_data = points[:, -2] * 1000 + points[:, -1] + 1
-
         processed_filepath = self.save_dir / mode / f"{scene:04}_{sub_scene:02}.npy"
         if not processed_filepath.parent.exists():
             processed_filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -170,12 +167,6 @@ class ScannetPreprocessing(BasePreprocessing):
 
         if mode == "test":
             return filebase
-
-        processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"scene{scene:04}_{sub_scene:02}.txt"
-        if not processed_gt_filepath.parent.exists():
-            processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
-        np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
-        filebase["instance_gt_filepath"] = str(processed_gt_filepath)
 
         filebase["color_mean"] = [
             float((features[:, 0] / 255).mean()),

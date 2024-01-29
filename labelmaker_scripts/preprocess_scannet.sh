@@ -1,4 +1,4 @@
-env_name=labelmaker-mix3d
+env_name=labelmaker-mix3d-preprocess
 eval "$(conda shell.bash hook)"
 conda activate $env_name
 
@@ -20,7 +20,7 @@ SAVE_DIR="data/processed/scannet200"
 GIT_REPO="data/raw/scannet/ScanNet"
 
 # preprocess
-python -m mix3d.datasets.preprocessing.scannet_preprocessing preprocess_sequential \
+python -m mix3d.datasets.preprocessing.scannet_preprocessing preprocess \
     --git_repo="$GIT_REPO" \
     --data_dir="$DATA_DIR" \
     --save_dir="$SAVE_DIR" \
