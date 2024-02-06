@@ -23,7 +23,7 @@ add_instance: false
 pin_memory: true
 num_workers: 4
 batch_size: 8
-cache_data: false
+cache_data: true
 
 # collation
 voxel_size: 0.02

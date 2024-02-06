@@ -40,13 +40,19 @@ def get_wordnet_to_scannet200_mapping():
 
 
 class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
+
+    mode_mapping = {
+        "train": "Training",
+        "validation": "Validation",
+    }
+
     def __init__(
         self,
         data_dir: str = "./data/raw/ARKitScenes_LabelMaker",
         save_dir: str = "./data/processed/arkitscenes_labelmaker",
         modes: tuple = {
-            "Training",
-            "Validation",
+            "train",
+            "validation",
         },
         n_jobs: int = -1,
     ):
@@ -58,7 +64,7 @@ class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
 
         # gathering files
         for mode in self.modes:
-            split_dir = self.data_dir / mode
+            split_dir = self.data_dir / self.mode_mapping[mode]
             scene_names = os.listdir(str(split_dir))
 
             filepaths = []
