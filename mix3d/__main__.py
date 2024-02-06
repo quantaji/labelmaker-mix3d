@@ -9,7 +9,8 @@ import torch
 from dotenv import load_dotenv
 from git import Repo
 from mix3d import __version__
-from mix3d.trainer.trainer import SemanticSegmentation
+# from mix3d.trainer.trainer import SemanticSegmentation
+from mix3d.trainer.trainer_multi_dataset import SemanticSegmentation
 from mix3d.utils.utils import flatten_dict, load_baseline_model, load_checkpoint_with_missing_or_exsessive_keys
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
