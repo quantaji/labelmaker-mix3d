@@ -42,7 +42,7 @@ pip install torch==${INSTALLED_PYTORCH_VERSION} torchvision==${INSTALLED_TORCHVI
 conda deactivate
 conda activate ${env_name}
 
-export ENV_FOLDER="${HOME}/LabelMaker_Mix3D_env"
+export ENV_FOLDER="${HOME}/labelmaker-mix3d"
 export BUILD_WITH_CUDA=1
 export CUDA_HOST_COMPILER="$conda_home/bin/gcc"
 export CUDA_PATH="$conda_home"
