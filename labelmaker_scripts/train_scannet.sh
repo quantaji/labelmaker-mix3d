@@ -3,7 +3,7 @@
 #SBATCH --output=scannet_train_%j.out
 #SBATCH --time=48:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=16G
+#SBATCH --mem-per-cpu=64G
 #SBATCH --gpus=a100-pcie-40gb:1
 
 module purge
@@ -20,4 +20,4 @@ export CUDA_HOST_COMPILER="$conda_home/bin/gcc"
 export CUDA_PATH="$conda_home"
 export CUDA_HOME=$CUDA_PATH
 
-poetry run train --config_name="config_scannet200.yaml"
+poetry run train --config-name="config_scannet200.yaml"
