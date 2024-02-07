@@ -5,7 +5,7 @@ general:
 
   project_name: mix3d
   workspace: kumuji
-  experiment_name: baseline
+  experiment_name: baseline_scannet2000
 
   save_dir: saved/${general.experiment_name}/${now:%Y-%m-%d_%H%M}
   # time/commit/md5(config)_uuid

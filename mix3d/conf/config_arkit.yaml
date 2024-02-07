@@ -5,7 +5,7 @@ general:
 
   project_name: labelmaker_mix3d
   workspace: jiguangda
-  experiment_name: arkitscenes_pretraining
+  experiment_name: baseline_arkitscenes
 
   save_dir: saved/${general.experiment_name}/${now:%Y-%m-%d_%H%M}
   # time/commit/md5(config)_uuid
