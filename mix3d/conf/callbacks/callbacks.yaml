@@ -1,6 +1,6 @@
 # @package _group_
 - _target_: pytorch_lightning.callbacks.ModelCheckpoint
-  monitor: val_IoU
+  monitor: val_IoU_0
   save_last: true
   save_top_k: 1
   mode: max
