@@ -4,4 +4,4 @@ max_epochs: 600
 min_epochs: 1
 weights_summary: "top"
 resume_from_checkpoint: null
-check_val_every_n_epoch: 1
+check_val_every_n_epoch: 20

@@ -70,7 +70,7 @@ class SemanticSegmentation(pl.LightningModule):
             "loss": loss,
         }
 
-    def validation_step(self, batch, batch_idx, dataloader_idx, *args, **kwargs):
+    def validation_step(self, batch, batch_idx, dataloader_idx=0, *args, **kwargs):
 
         data, target = batch
 
@@ -107,6 +107,9 @@ class SemanticSegmentation(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
 
+        if isinstance(outputs[0], dict):
+            outputs = [outputs]
+
         val_losses = [torch.cat([out["val_loss"] for out in output], dim=0).mean() for output in outputs]
         results = {}
         for i, val_loss in enumerate(val_losses):
@@ -125,7 +128,7 @@ class SemanticSegmentation(pl.LightningModule):
 
         self.log_dict(results)
 
-    def test_step(self, batch, batch_idx, dataloader_idx, *args, **kwargs):
+    def test_step(self, batch, batch_idx, dataloader_idx=0, *args, **kwargs):
         data, target = batch
         inverse_maps = data.inverse_maps
         original_labels = data.original_labels
