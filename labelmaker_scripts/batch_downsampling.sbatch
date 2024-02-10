@@ -44,7 +44,7 @@ while IFS= read -r line; do
     target_dir=$root_dir/$fold/$video_id
     if [[ 10#$group_int -ge 10#$start_group ]] && [[ 10#$group_int -le 10#$end_group ]]; then
         echo $video_id
-        sbatch -A ls_polle --parsable -n 1 --cpus-per-task=2 --mem-per-cpu=32G --time=1:00:00 --output=$log_dir/${video_id}_downsampling.out --wrap="cd /cluster/project/cvg/labelmaker/labelmaker-mix3d && source labelmaker_scripts/activate_env.sh && python labelmaker_scripts/downsampling.py --workspace $target_dir"
+        sbatch -A ls_polle --parsable -n 1 --cpus-per-task=2 --mem-per-cpu=32G --time=10:00:00 --output=$log_dir/${video_id}_downsampling.out --wrap="cd /cluster/project/cvg/labelmaker/labelmaker-mix3d && source labelmaker_scripts/activate_env.sh && python labelmaker_scripts/downsampling.py --workspace $target_dir"
 
     fi
 done <"$input"

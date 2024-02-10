@@ -34,6 +34,22 @@ def load_ply_with_normals(filepath):
     return coords, feats, labels
 
 
+def load_ply_point_cloud_with_normals(filepath):
+    pcd = open3d.io.read_point_cloud(str(filepath))
+    if not pcd.has_normals():
+        print(f"{str(filepath)} does not have normals.")
+        pcd.estimate_normals()
+
+    vertices = np.asarray(pcd.points)
+    normals = np.asarray(pcd.normals)
+
+    coords, feats, labels = load_ply(filepath)
+    assert np.allclose(coords, vertices), "different coordinates"
+    feats = np.hstack((feats, normals))
+
+    return coords, feats, labels
+
+
 def load_obj_with_normals(filepath):
     mesh = open3d.io.read_triangle_mesh(str(filepath))
     if not mesh.has_vertex_normals():
