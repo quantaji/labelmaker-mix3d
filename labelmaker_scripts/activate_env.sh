@@ -1,5 +1,6 @@
+#!/usr/bin/bash
 module load gcc/11.4.0 cuda/12.1.1 eth_proxy
-export PATH="/cluster/project/cvg/labelmaker/miniconda3/bin:\${PATH}"
+export PATH="/cluster/project/cvg/labelmaker/miniconda3/bin:${PATH}"
 env_name=labelmaker-mix3d
 eval "$(conda shell.bash hook)"
 conda activate $env_name

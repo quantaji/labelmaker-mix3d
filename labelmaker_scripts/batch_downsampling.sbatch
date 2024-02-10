@@ -52,3 +52,5 @@ done <"$input"
 
 
 
+# test
+# sbatch -A ls_polle --parsable -n 1 --cpus-per-task=2 --mem-per-cpu=32G --time=1:00:00 --output=downsampling.out --wrap="cd /cluster/project/cvg/labelmaker/labelmaker-mix3d && bash labelmaker_scripts/activate_env.sh && python labelmaker_scripts/downsampling.py --workspace /cluster/project/cvg/labelmaker/ARKitScene_LabelMaker/Validation/42899694"
