@@ -9,7 +9,8 @@ def check(
 ):
     workspace = Path(workspace)
 
-    
+    tgt_label_file = workspace / "labels_downsampled.txt"
+    tgt_pcd_file = workspace / "pcd_downsampled.ply"
 
     if tgt_label_file.exists() and tgt_pcd_file.exists():
         return
