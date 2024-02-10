@@ -16,14 +16,16 @@ def visualize_downsampled_pcd_label(workspace: str, save_path: str):
 
     pcd = o3d.io.read_point_cloud(str(pcd_path))
 
-    label = np.loadtxt(str(workspace / "labels.txt"), dtype=np.uint8).reshape(-1, 1)
+    label = np.loadtxt(str(label_path), dtype=np.uint8).reshape(-1, 1)
 
     color_mapping = {}
     info = get_wordnet()
     for item in info:
-        color_mapping[item["id"]] = item["color"]
+        color_mapping[item["id"]] = tuple(item["color"])
 
     label_color = np.asarray(np.vectorize(color_mapping.get)(label)) / 255
+
+    print(np.asarray(pcd.points).shape, label_color.shape, label_color.min(), label_color.max())
     pcd.colors = o3d.utility.Vector3dVector(np.moveaxis(label_color.reshape(3, -1), 0, -1))
 
     o3d.io.write_point_cloud(str(save_path), pcd)

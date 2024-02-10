@@ -74,7 +74,9 @@ class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
 
             filepaths = []
             for scene in scene_names:
-                filepaths.append(split_dir / scene / "pcd_downsampled.ply")
+                file_path = split_dir / scene / "pcd_downsampled.ply"
+                if file_path.exists() and os.path.getsize(str(file_path)) <= 50 * 1024 * 1024:
+                    filepaths.append(file_path)
 
             self.files[mode] = natsorted(filepaths)
 
