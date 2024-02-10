@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
+import open3d as o3d
 import pandas as pd
 from fire import Fire
 from joblib import Parallel, delayed
@@ -15,6 +16,7 @@ from mix3d.datasets.preprocessing.base_preprocessing import BasePreprocessing
 from mix3d.datasets.scannet200.scannet200_constants import CLASS_LABELS_200, SCANNET_COLOR_MAP_200, VALID_CLASS_IDS_200
 from mix3d.utils.point_cloud_utils import load_ply_with_normals
 from natsort import natsorted
+from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 
 
 def get_wordnet_to_scannet200_mapping():
@@ -51,16 +53,19 @@ class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
         data_dir: str = "./data/raw/ARKitScenes_LabelMaker",
         save_dir: str = "./data/processed/arkitscenes_labelmaker",
         modes: tuple = {
-            "train",
             "validation",
+            "train",
         },
         n_jobs: int = -1,
+        voxel_size: float = 0.02,
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
         self.create_label_database()
 
         self.mapping_array = get_wordnet_to_scannet200_mapping()
+
+        self.voxel_size = voxel_size
 
         # gathering files
         for mode in self.modes:
@@ -69,7 +74,7 @@ class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
 
             filepaths = []
             for scene in scene_names:
-                filepaths.append(split_dir / scene / "point_lifted_mesh.ply")
+                filepaths.append(split_dir / scene / "mesh.ply")
 
             self.files[mode] = natsorted(filepaths)
 
@@ -99,17 +104,54 @@ class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
 
         # reading both files and checking that they are fitting
         coords, features, _ = load_ply_with_normals(filepath)
+
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(coords)
+
+        downsampled_pcd = pcd.voxel_down_sample(
+            voxel_size=self.voxel_size,
+        )
+        downsampled_coords = np.asarray(downsampled_pcd.points)
+        feat_interp = LinearNDInterpolator(
+            points=coords,
+            values=features,
+            fill_value=0.0,
+        )
+        downsampled_features = feat_interp(downsampled_coords)
+
         file_len = len(coords)
         filebase["file_len"] = file_len
-        points = np.hstack((coords, features))
+        points = np.hstack((downsampled_coords, downsampled_features))
 
         # reading label in wordnet format
+        point_lifted_filepath = Path(str(filepath).replace("mesh.ply", "point_lifted_mesh.ply"))
+        point_lifted_coords, _, _ = load_ply_with_normals(point_lifted_filepath)
+
         label_file = Path(filepath).parent / "labels.txt"
         wordnet_label = np.loadtxt(str(label_file), dtype=np.uint8).reshape(-1, 1)
-
         scannet200_label = self.mapping_array[wordnet_label]
 
-        points = np.hstack((points, scannet200_label))
+        label_interp = NearestNDInterpolator(
+            x=point_lifted_coords,
+            y=scannet200_label,
+        )
+        downsampled_scannet200_label = label_interp(downsampled_coords)
+
+        points = np.hstack((points, downsampled_scannet200_label))
+
+        # ## Testing starts
+        # test_pcd = o3d.geometry.PointCloud()
+        # test_pcd.points = o3d.utility.Vector3dVector(downsampled_coords)
+
+        # rgb_color = downsampled_features[:, :3]
+        # test_pcd.colors = o3d.utility.Vector3dVector(rgb_color / 255)
+
+        # o3d.io.write_point_cloud(str(self.save_dir / mode / f"{video_id}_colored.ply"), test_pcd)
+
+        # label_color = np.asarray(np.vectorize(SCANNET_COLOR_MAP_200.get)(downsampled_scannet200_label)) / 255
+        # test_pcd.colors = o3d.utility.Vector3dVector(np.moveaxis(label_color.reshape(3, -1), 0, -1))
+        # o3d.io.write_point_cloud(str(self.save_dir / mode / f"{video_id}_labeled.ply"), test_pcd)
+        # ## Testing ends
 
         processed_filepath = self.save_dir / mode / f"{video_id}.npy"
         if not processed_filepath.parent.exists():
@@ -118,14 +160,14 @@ class ARKitScenesLabelMakerPreprocessing(BasePreprocessing):
         filebase["filepath"] = str(processed_filepath)
 
         filebase["color_mean"] = [
-            float((features[:, 0] / 255).mean()),
-            float((features[:, 1] / 255).mean()),
-            float((features[:, 2] / 255).mean()),
+            float((downsampled_features[:, 0] / 255).mean()),
+            float((downsampled_features[:, 1] / 255).mean()),
+            float((downsampled_features[:, 2] / 255).mean()),
         ]
         filebase["color_std"] = [
-            float(((features[:, 0] / 255) ** 2).mean()),
-            float(((features[:, 1] / 255) ** 2).mean()),
-            float(((features[:, 2] / 255) ** 2).mean()),
+            float(((downsampled_features[:, 0] / 255) ** 2).mean()),
+            float(((downsampled_features[:, 1] / 255) ** 2).mean()),
+            float(((downsampled_features[:, 2] / 255) ** 2).mean()),
         ]
         return filebase
 

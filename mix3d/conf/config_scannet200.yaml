@@ -20,7 +20,7 @@ defaults:
   - data/data_loaders: simple_loader
   - data/datasets: scannet200
   - data/collation_functions: voxelize_collate
-  - logging: minimal
+  - logging: offline
   - model: baseline
   - metrics: miou
   - optimizer: adamw
