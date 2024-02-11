@@ -1,9 +1,10 @@
 #!/usr/bin/bash
 #SBATCH --job-name="labelmaker-submit"
 #SBATCH --output=scannet_train_%j.out
-#SBATCH --time=48:00:00
+#SBATCH --time=96:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=64G
+#SBATCH --cpus-per-task=8
+#SBATCH --mem-per-cpu=16G
 #SBATCH --gpus=a100-pcie-40gb:1
 
 module purge
