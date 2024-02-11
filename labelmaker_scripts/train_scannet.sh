@@ -5,6 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=16G
+#SBATCH -A ls_polle
 #SBATCH --gpus=a100-pcie-40gb:1
 
 module purge
