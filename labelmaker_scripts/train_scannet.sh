@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-#SBATCH --job-name="labelmaker-submit"
+#SBATCH --job-name="scannet"
 #SBATCH --output=scannet_train_%j.out
 #SBATCH --time=96:00:00
 #SBATCH --ntasks=1

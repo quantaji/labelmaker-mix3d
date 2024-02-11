@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-#SBATCH --job-name="labelmaker-submit"
+#SBATCH --job-name="arkit"
 #SBATCH --output=arkit_train_%j.out
 #SBATCH --time=120:00:00
 #SBATCH --ntasks=1
