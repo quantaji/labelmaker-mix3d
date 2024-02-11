@@ -1,12 +1,12 @@
 #!/usr/bin/bash
 #SBATCH --job-name="labelmaker-submit"
 #SBATCH --output=arkit_train_%j.out
-#SBATCH --time=120:00:00
+#SBATCH --time=300:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=64G
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=16G
-#SBATCH --gpus=a100-pcie-40gb:1
+#SBATCH --gpus=rtx_4090:1
 
 module purge
 module load gcc/11.4.0 cuda/12.1.1 eth_proxy
