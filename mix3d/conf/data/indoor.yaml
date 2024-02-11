@@ -22,7 +22,7 @@ add_instance: false
 # data loader
 pin_memory: true
 num_workers: 4
-batch_size: 4
+batch_size: 8
 cache_data: true
 
 # collation

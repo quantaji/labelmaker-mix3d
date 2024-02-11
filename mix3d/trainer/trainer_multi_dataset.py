@@ -109,7 +109,7 @@ class SemanticSegmentation(pl.LightningModule):
     def training_epoch_end(self, outputs):
         train_loss = torch.cat([out["loss"] for out in outputs], dim=0).mean()
         results = {"train_loss": train_loss}
-        self.log_dict(results, sync_dist=True)
+        self.log_dict(results)
 
         garbage_collection_cuda()
 
@@ -134,7 +134,7 @@ class SemanticSegmentation(pl.LightningModule):
 
             self.confusions[j].reset()
 
-        self.log_dict(results, sync_dist=True)
+        self.log_dict(results)
 
         garbage_collection_cuda()
 
