@@ -24,7 +24,7 @@ export CUDA_HOME=$CUDA_PATH
 source_dir=/cluster/project/cvg/labelmaker/labelmaker-mix3d
 target_dir=$TMPDIR/labelmaker-mix3d
 echo "Start coping files!"
-rsync -r -v \
+rsync -r \
     --exclude="data/processed/arkitscenes_labelmaker" \
     $source_dir/ \
     $target_dir
