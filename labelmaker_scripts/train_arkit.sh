@@ -6,7 +6,7 @@
 #SBATCH --mem-per-cpu=64G
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=16G
-#SBATCH --gpus=a100-pcie-40gb:1
+#SBATCH --gpus=v100:1
 
 module purge
 module load gcc/11.4.0 cuda/12.1.1 eth_proxy
