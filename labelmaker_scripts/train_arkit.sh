@@ -26,7 +26,6 @@ source_dir=/cluster/project/cvg/labelmaker/labelmaker-mix3d
 target_dir=$TMPDIR/labelmaker-mix3d
 echo "Start coping files!"
 rsync -r \
-    --exclude="data/processed/scannet200" \
     $source_dir/ \
     $target_dir
 echo "Files copy finished!"
