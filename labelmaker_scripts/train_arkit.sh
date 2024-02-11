@@ -34,7 +34,7 @@ cd $target_dir
 poetry run train --config-name="config_arkit.yaml"
 
 echo "Start coping files!"
-cp $target_dir/saved/* $source_dir/saved
+cp -r $target_dir/saved/* $source_dir/saved
 echo "Files copy finished!"
 
 
