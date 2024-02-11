@@ -2,13 +2,15 @@ import zipfile
 from contextlib import nullcontext
 from pathlib import Path
 
-import hydra
-from omegaconf.listconfig import ListConfig
-import MinkowskiEngine as ME
 import numpy as np
+
+import hydra
+import MinkowskiEngine as ME
 import pytorch_lightning as pl
 import torch
 from mix3d.models.metrics import IoU
+from omegaconf.listconfig import ListConfig
+from pytorch_lightning.utilities.memory import garbage_collection_cuda
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -57,6 +59,8 @@ class SemanticSegmentation(pl.LightningModule):
         return x
 
     def training_step(self, batch, batch_idx, *args, **kwargs):
+        garbage_collection_cuda()
+
         data, target = batch
         data = ME.SparseTensor(
             coordinates=data.coordinates,
@@ -71,6 +75,7 @@ class SemanticSegmentation(pl.LightningModule):
         }
 
     def validation_step(self, batch, batch_idx, dataloader_idx=0, *args, **kwargs):
+        garbage_collection_cuda()
 
         data, target = batch
 
@@ -96,6 +101,7 @@ class SemanticSegmentation(pl.LightningModule):
             output[i] = out[inverse_map].numpy()
 
         self.confusions[dataloader_idx].add(np.hstack(output), np.hstack(original_labels))
+
         return {
             "val_loss": loss,
         }
@@ -104,6 +110,8 @@ class SemanticSegmentation(pl.LightningModule):
         train_loss = torch.cat([out["loss"] for out in outputs], dim=0).mean()
         results = {"train_loss": train_loss}
         self.log_dict(results)
+
+        garbage_collection_cuda()
 
     def validation_epoch_end(self, outputs):
 
@@ -127,6 +135,8 @@ class SemanticSegmentation(pl.LightningModule):
             self.confusions[j].reset()
 
         self.log_dict(results)
+
+        garbage_collection_cuda()
 
     def test_step(self, batch, batch_idx, dataloader_idx=0, *args, **kwargs):
         data, target = batch
