@@ -14,7 +14,7 @@ general:
   version: test_scannet200 # md5[:8] of config
 
   gpus: 2
-  accelerator: ddp
+  accelerator: dp
 
 defaults:
   - data: indoor
