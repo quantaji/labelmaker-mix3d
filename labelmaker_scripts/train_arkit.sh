@@ -1,9 +1,11 @@
 #!/usr/bin/bash
 #SBATCH --job-name="labelmaker-submit"
 #SBATCH --output=arkit_train_%j.out
-#SBATCH --time=48:00:00
+#SBATCH --time=200:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=64G
+#SBATCH --cpus-per-task=8
+#SBATCH --mem-per-cpu=16G
 #SBATCH --gpus=a100-pcie-40gb:1
 
 module purge
@@ -20,4 +22,20 @@ export CUDA_HOST_COMPILER="$conda_home/bin/gcc"
 export CUDA_PATH="$conda_home"
 export CUDA_HOME=$CUDA_PATH
 
+source_dir=/cluster/project/cvg/labelmaker/labelmaker-mix3d
+target_dir=$TMPDIR/labelmaker-mix3d
+echo "Start coping files!"
+rsync -r \
+    --exclude="data/processed/scannet200" \
+    $source_dir/ \
+    $target_dir
+echo "Files copy finished!"
+
+cd $target_dir
 poetry run train --config-name="config_arkit.yaml"
+
+echo "Start coping files!"
+cp $target_dir/saved/* $source_dir/saved
+echo "Files copy finished!"
+
+
