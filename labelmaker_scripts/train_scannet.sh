@@ -27,13 +27,10 @@ target_dir=$TMPDIR/labelmaker-mix3d
 echo "Start coping files!"
 rsync -r \
     --exclude="data/processed/arkitscenes_labelmaker" \
+    --exclude="saved" \
     $source_dir/ \
     $target_dir
 echo "Files copy finished!"
 
 cd $target_dir
 poetry run train --config-name="config_scannet200.yaml"
-
-echo "Start coping files!"
-cp -r $target_dir/saved/* $source_dir/saved
-echo "Files copy finished!"

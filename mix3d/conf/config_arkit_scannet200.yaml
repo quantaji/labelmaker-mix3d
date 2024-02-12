@@ -7,7 +7,7 @@ general:
   workspace: jiguangda
   experiment_name: baseline_arkitscenes_scannet200
 
-  save_dir: saved/${general.experiment_name}/${now:%Y-%m-%d_%H%M}
+  save_dir: /cluster/project/cvg/labelmaker/labelmaker-mix3d/saved/${general.experiment_name}/${now:%Y-%m-%d_%H%M}
   # time/commit/md5(config)_uuid
   # time/experiment_id/version_uuid
   experiment_id: arkitscenes_pretraining # commit[:8], or unique from logger
@@ -31,8 +31,8 @@ defaults:
 
 hydra:
   run:
-    dir: saved/hydra_logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: /cluster/project/cvg/labelmaker/labelmaker-mix3d/saved/hydra_logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
   sweep:
-    dir: saved/hydra_logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: /cluster/project/cvg/labelmaker/labelmaker-mix3d/saved/hydra_logs/${now:%Y-%m-%d}/${now:%H-%M-%S}
     # dir: ${general.save_dir}
     subdir: ${hydra.job.num}_${hydra.job.id}
