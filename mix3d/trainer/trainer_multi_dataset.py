@@ -138,12 +138,16 @@ class SemanticSegmentation(pl.LightningModule):
 
         garbage_collection_cuda()
 
-    def test_step(self, batch, batch_idx, dataloader_idx=0, *args, **kwargs):
+    def test_step(self, batch, batch_idx, *args, **kwargs):
         data, target = batch
         inverse_maps = data.inverse_maps
         original_labels = data.original_labels
-        data = ME.SparseTensor(coords=data.coordinates, feats=data.features)
-        data.to(self.device)
+        data = ME.SparseTensor(
+            coordinates=data.coordinates,
+            features=data.features,
+            device=self.device,
+        )
+        data
         output = self.forward(data)
         loss = 0
         if original_labels[0].size > 0:
@@ -208,11 +212,12 @@ class SemanticSegmentation(pl.LightningModule):
 
         self.validation_dataset = [hydra.utils.instantiate(conf) for conf in self.config.data.validation_dataset]
 
-        self.test_dataset = [hydra.utils.instantiate(conf) for conf in self.config.data.test_dataset]
+        self.test_dataset = hydra.utils.instantiate(self.config.data.test_dataset)
 
-        length_max = max(len(self.train_dataset), len(self.validation_dataset), len(self.validation_dataset))
+        length_max = max(len(self.train_dataset), len(self.validation_dataset))
 
         self.confusions = [hydra.utils.instantiate(self.config.metrics) for _ in range(length_max)]
+        self.confusion = hydra.utils.instantiate(self.config.metrics)
 
         self.labels_info = train_dataset_list[0].label_info
 
@@ -237,14 +242,11 @@ class SemanticSegmentation(pl.LightningModule):
 
     def test_dataloader(self):
         c_fn = hydra.utils.instantiate(self.config.data.test_collation)
-        return [
-            hydra.utils.instantiate(
-                self.config.data.test_dataloader,
-                dataset,
-                collate_fn=c_fn,
-            )
-            for dataset in self.test_dataset
-        ]
+        return hydra.utils.instantiate(
+            self.config.data.test_dataloader,
+            self.test_dataset,
+            collate_fn=c_fn,
+        )
 
 
 def scannet_submission(path, outputs, results, test_filebase, remap_function):

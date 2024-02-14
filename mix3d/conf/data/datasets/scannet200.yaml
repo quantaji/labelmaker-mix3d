@@ -41,17 +41,17 @@ validation_dataset:
     add_instance: ${data.add_instance}
 
 test_dataset:
-  - _target_: mix3d.datasets.semseg.SemanticSegmentationDataset
-    data_dir: data/processed/scannet200
-    image_augmentations_path: null
-    volume_augmentations_path: null
-    label_db_filepath: data/processed/scannet200/label_database.yaml
-    color_mean_std: data/processed/scannet200/color_mean_std.yaml
-    data_percent: 1.0
-    mode: ${data.test_mode}
-    ignore_label: ${data.ignore_label}
-    num_labels: ${data.num_labels}
-    add_raw_coordinates: ${data.add_raw_coordinates}
-    add_colors: ${data.add_colors}
-    add_normals: ${data.add_normals}
-    add_instance: ${data.add_instance}
+  _target_: mix3d.datasets.semseg.SemanticSegmentationDataset
+  data_dir: data/processed/scannet200
+  image_augmentations_path: null
+  volume_augmentations_path: null
+  label_db_filepath: data/processed/scannet200/label_database.yaml
+  color_mean_std: data/processed/scannet200/color_mean_std.yaml
+  data_percent: 1.0
+  mode: ${data.test_mode}
+  ignore_label: ${data.ignore_label}
+  num_labels: ${data.num_labels}
+  add_raw_coordinates: ${data.add_raw_coordinates}
+  add_colors: ${data.add_colors}
+  add_normals: ${data.add_normals}
+  add_instance: ${data.add_instance}
