@@ -185,7 +185,9 @@ class SemanticSegmentation(pl.LightningModule):
             for i, k in enumerate(self.labels_info.keys()):
                 metric_name = self.labels_info[k]["name"]
                 results["test_IoU_" + metric_name] = results_iou[i]
-            results["test_IoU"] = results_iou.mean()
+            results["test_IoU"] = np.nanmean(results_iou)
+
+        self.log_dict(results)
 
         if self.test_dataset.data[0].get("scene"):
             results = scannet_submission(
@@ -195,7 +197,6 @@ class SemanticSegmentation(pl.LightningModule):
                 self.test_dataset.data,
                 self.test_dataset._remap_model_output,
             )
-        self.log_dict(results)
 
     def configure_optimizers(self):
         optimizer = hydra.utils.instantiate(self.config.optimizer, params=self.parameters())
