@@ -16,12 +16,15 @@ export MAX_JOBS=6
 export TORCH_CUDA_ARCH_LIST="6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6 8.9"
 
 DATA_DIR="data/raw/scannet/scannet"
-SAVE_DIR="data/processed/scannet200"
+# SAVE_DIR="data/processed/scannet200"
+SAVE_DIR="data/processed/scannet"
 GIT_REPO="data/raw/scannet/ScanNet"
+SCANNET200=0
+# SCANNET200=1
 
 # preprocess
 python -m mix3d.datasets.preprocessing.scannet_preprocessing preprocess \
     --git_repo="$GIT_REPO" \
     --data_dir="$DATA_DIR" \
     --save_dir="$SAVE_DIR" \
-    --scannet200="true"
+    --scannet200=$SCANNET200

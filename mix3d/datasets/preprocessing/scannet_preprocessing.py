@@ -67,11 +67,12 @@ class ScannetPreprocessing(BasePreprocessing):
             self._save_yaml(self.save_dir / "label_database.yaml", label_database)
             return label_database
         else:
+            print("hahaha")
             if (self.save_dir / "label_database.yaml").exists():
                 return self._load_yaml(self.save_dir / "label_database.yaml")
             df = pd.read_csv(self.data_dir / "scannetv2-labels.combined.tsv", sep="\t")
             df = df[~df[["nyu40class", "nyu40id"]].duplicated()][["nyu40class", "nyu40id"]].set_index("nyu40id").sort_index()[["nyu40class"]].rename(columns={"nyu40class": "name"}).replace(" ", "_", regex=True)
-            df = pd.DataFrame([{"name": "empty"}]).append(df)
+            df = pd.concat([pd.DataFrame([{"name": "empty"}]), df], ignore_index=True)
             df["validation"] = False
 
             with open(git_repo / "Tasks" / "Benchmark" / "classes_SemVoxLabel-nyu40id.txt") as f:
