@@ -3,8 +3,8 @@
 #SBATCH --output=labelmaker_mix3d_env_build.out
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=6
-#SBATCH --mem-per-cpu=4G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=2G
 #SBATCH --tmp=32G
 
 set -e
@@ -49,7 +49,7 @@ export CUDA_PATH="$conda_home"
 export PATH="$conda_home/bin:$PATH"
 export CUDA_HOME=$CUDA_PATH
 export FORCE_CUDA=1
-export MAX_JOBS=6
+export MAX_JOBS=16
 export TORCH_CUDA_ARCH_LIST="6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6 8.9"
 
 cd ${ENV_FOLDER}
