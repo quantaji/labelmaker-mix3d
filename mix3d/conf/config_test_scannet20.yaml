@@ -5,20 +5,20 @@ general:
 
   project_name: mix3d
   workspace: jiguangda
-  experiment_name: evaluation_scannet200
+  experiment_name: evaluation_scannet20
 
   save_dir: saved/${general.experiment_name}/${data.test_mode}_${now:%Y-%m-%d_%H%M}
   # time/commit/md5(config)_uuid
   # time/experiment_id/version_uuid
-  experiment_id: test_scannet200 # commit[:8], or unique from logger
-  version: test_scannet200 # md5[:8] of config
+  experiment_id: test_scannet20 # commit[:8], or unique from logger
+  version: test_scannet20 # md5[:8] of config
 
   gpus: 1
 
 defaults:
   - data: indoor
   - data/data_loaders: simple_loader
-  - data/datasets: scannet200
+  - data/datasets: scannet
   - data/collation_functions: voxelize_collate
   - logging: minimal
   - model: baseline

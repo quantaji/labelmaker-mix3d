@@ -8,7 +8,8 @@ export CUDA_HOST_COMPILER="$conda_home/bin/gcc"
 export CUDA_PATH="$conda_home"
 export CUDA_HOME=$CUDA_PATH
 
-CKPT_PATH="/home/guangda/repos/labelmaker-mix3d/saved/baseline_arkitscenes/2024-02-19_1444/1b9abe1d/20419e2c_5d34/switch_cls_head\=20.ckpt"
+# CKPT_PATH="/home/guangda/repos/labelmaker-mix3d/saved/baseline_arkitscenes/2024-02-19_1444/1b9abe1d/20419e2c_5d34/switch_cls_head\=20.ckpt"
+CKPT_PATH="/home/guangda/repos/labelmaker-mix3d/saved/baseline_arkitscenes/2024-02-25_2142/5fa5d3bd/3a2b7843_fd39/switch_cls_head\=20.ckpt"
 
 cd /home/guangda/repos/labelmaker-mix3d
 poetry run train --config-name="config_scannet20.yaml" \

@@ -254,7 +254,7 @@ def scannet_submission(path, outputs, results, test_filebase, remap_function):
     # checking if we are submitting scannet
     filepaths = []
     for out, info in zip(outputs, test_filebase):
-        save_path = Path(path).parent / "submission" / f"scene{info['scene']:04}_{info['sub_scene']:02}.txt"
+        save_path = Path(path) / "submission" / f"scene{info['scene']:04}_{info['sub_scene']:02}.txt"
         if not save_path.parent.exists():
             save_path.parent.mkdir(parents=True, exist_ok=True)
         out = remap_function(out)
@@ -264,6 +264,6 @@ def scannet_submission(path, outputs, results, test_filebase, remap_function):
     zip_path = save_path.parent.parent / "submission.zip"
     with zipfile.ZipFile(zip_path, "w") as myzip:
         for file in filepaths:
-            myzip.write(file)
+            myzip.write(file, arcname=file.name)
     results["submission_path"] = str(zip_path)
     return results
