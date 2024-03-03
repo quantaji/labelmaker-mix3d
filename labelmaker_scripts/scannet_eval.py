@@ -66,7 +66,7 @@ def eval_mIoU(
     confusion_matrix = confusion.value()
     results_iou = iou.value(confusion_matrix)
 
-    results = {"mIoU": np.nanmean(results_iou)}
+    results = {"mIoU": np.nan_to_num(results_iou).mean()}
     for i, k in enumerate(label_names):
         results[k] = results_iou[i]
 

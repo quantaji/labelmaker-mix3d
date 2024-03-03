@@ -130,7 +130,7 @@ class SemanticSegmentation(pl.LightningModule):
             for i, k in enumerate(self.labels_info.keys()):
                 metric_name = self.labels_info[k]["name"]
                 results[f"val_IoU_{j}_" + metric_name] = results_iou[i]
-            results[f"val_IoU_{j}"] = np.nanmean(results_iou)
+            results[f"val_IoU_{j}"] = np.nan_to_num(results_iou).mean()
 
             self.confusions[j].reset()
 
@@ -185,7 +185,7 @@ class SemanticSegmentation(pl.LightningModule):
             for i, k in enumerate(self.labels_info.keys()):
                 metric_name = self.labels_info[k]["name"]
                 results["test_IoU_" + metric_name] = results_iou[i]
-            results["test_IoU"] = np.nanmean(results_iou)
+            results["test_IoU"] = np.nan_to_num(results_iou).mean()
 
         self.log_dict(results)
 
