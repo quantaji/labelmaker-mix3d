@@ -1,0 +1,23 @@
+{
+    "bathtub": 0.859,
+    "bed": 0.818,
+    "bookshelf": 0.832,
+    "cabinet": 0.709,
+    "chair": 0.84,
+    "counter": 0.521,
+    "curtain": 0.853,
+    "desk": 0.66,
+    "door": 0.643,
+    "floor": 0.951,
+    "otherfurniture": 0.544,
+    "picture": 0.286,
+    "refrigerator": 0.731,
+    "shower curtain": 0.893,
+    "sink": 0.675,
+    "sofa": 0.772,
+    "table": 0.683,
+    "toilet": 0.874,
+    "wall": 0.852,
+    "window": 0.727
+  }
+  
